@@ -1,0 +1,49 @@
+[gd_scene load_steps=9 format=3 uid="uid://cg7fyqtvkqk8u"]
+
+[ext_resource type="Script" path="res://scenes/objects/player.gd" id="1_8x552"]
+[ext_resource type="Texture2D" uid="uid://cujh1fxrclh5m" path="res://resources/textures/player.png" id="2_3aigx"]
+[ext_resource type="Texture2D" uid="uid://bm5nvcejptu5a" path="res://resources/textures/player_gun.png" id="3_ibcr5"]
+[ext_resource type="AudioStream" uid="uid://67f804o8n6mv" path="res://resources/sounds/player_shot.wav" id="4_d2cru"]
+[ext_resource type="AudioStream" uid="uid://bxjjqcfedceu4" path="res://resources/sounds/player_hurt.wav" id="5_2o2uj"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ipfa8"]
+size = Vector2(28, 28)
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_o4er5"]
+random_pitch = 1.4
+streams_count = 1
+stream_0/stream = ExtResource("4_d2cru")
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_y7mna"]
+random_pitch = 1.8
+streams_count = 1
+stream_0/stream = ExtResource("5_2o2uj")
+
+[node name="Player" type="CharacterBody2D"]
+motion_mode = 1
+script = ExtResource("1_8x552")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_ipfa8")
+
+[node name="Gun" type="Sprite2D" parent="."]
+texture = ExtResource("3_ibcr5")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_3aigx")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="ShotCooldown" type="Timer" parent="."]
+wait_time = 0.2
+one_shot = true
+
+[node name="DamageCooldown" type="Timer" parent="."]
+wait_time = 0.12
+one_shot = true
+
+[node name="Shot" type="AudioStreamPlayer" parent="."]
+stream = SubResource("AudioStreamRandomizer_o4er5")
+
+[node name="Hurt" type="AudioStreamPlayer" parent="."]
+stream = SubResource("AudioStreamRandomizer_y7mna")

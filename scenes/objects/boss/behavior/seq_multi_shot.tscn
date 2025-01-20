@@ -1,0 +1,16 @@
+[gd_scene load_steps=4 format=3 uid="uid://bt1yw6ioibr33"]
+
+[ext_resource type="Script" path="res://addons/DVs_behavior_tree/behavior_tree/composites/sequence.gd" id="1_1qcki"]
+[ext_resource type="Script" path="res://scenes/objects/boss/behavior/multi_shot.gd" id="2_51cxi"]
+[ext_resource type="Script" path="res://addons/DVs_behavior_tree/behavior_tree/leaves/wait_for_time.gd" id="3_audw4"]
+
+[node name="SeqMultiShot" type="Node"]
+script = ExtResource("1_1qcki")
+
+[node name="MultiShot" type="Node" parent="."]
+script = ExtResource("2_51cxi")
+
+[node name="BTWaitForTime" type="Node" parent="."]
+script = ExtResource("3_audw4")
+min = 1.5
+max = 1.5

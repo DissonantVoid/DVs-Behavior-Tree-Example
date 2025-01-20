@@ -1,0 +1,16 @@
+[gd_scene load_steps=4 format=3 uid="uid://nvyqx0sfxs1y"]
+
+[ext_resource type="Script" path="res://addons/DVs_behavior_tree/behavior_tree/composites/sequence.gd" id="1_vcdsh"]
+[ext_resource type="Script" path="res://scenes/objects/boss/behavior/simple_shot.gd" id="2_to6yv"]
+[ext_resource type="Script" path="res://addons/DVs_behavior_tree/behavior_tree/leaves/wait_for_time.gd" id="3_4ao1y"]
+
+[node name="SeqSimpleShot" type="Node"]
+script = ExtResource("1_vcdsh")
+
+[node name="SimpleShot" type="Node" parent="."]
+script = ExtResource("2_to6yv")
+
+[node name="BTWaitForTime" type="Node" parent="."]
+script = ExtResource("3_4ao1y")
+min = 0.3
+max = 0.3

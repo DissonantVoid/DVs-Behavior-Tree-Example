@@ -1,0 +1,165 @@
+[gd_scene load_steps=21 format=3 uid="uid://dw7wkpvihlqgm"]
+
+[ext_resource type="Script" path="res://scenes/objects/boss/boss.gd" id="1_eokto"]
+[ext_resource type="Texture2D" uid="uid://bjb32bd648mwh" path="res://resources/textures/boss.png" id="1_xrxtq"]
+[ext_resource type="AudioStream" uid="uid://4kp5jxamx8pr" path="res://resources/sounds/boss_hurt.wav" id="3_0xk7r"]
+[ext_resource type="AudioStream" uid="uid://bycigkj2c7cc2" path="res://resources/sounds/boss_shot.wav" id="3_dvr77"]
+[ext_resource type="Script" path="res://addons/DVs_behavior_tree/behavior_tree/behavior_tree.gd" id="3_on36q"]
+[ext_resource type="Script" path="res://addons/DVs_behavior_tree/behavior_tree/composites/fallback.gd" id="4_xboof"]
+[ext_resource type="Script" path="res://addons/DVs_behavior_tree/behavior_tree/composites/sequence.gd" id="5_yndej"]
+[ext_resource type="Script" path="res://addons/DVs_behavior_tree/behavior_tree/leaves/blackboard_check.gd" id="6_vldx5"]
+[ext_resource type="Script" path="res://scenes/objects/boss/behavior/dead.gd" id="7_8u207"]
+[ext_resource type="Script" path="res://addons/DVs_behavior_tree/behavior_tree/leaves/blackboard_modify.gd" id="8_e3wu0"]
+[ext_resource type="Script" path="res://scenes/objects/boss/behavior/is_player_in_range.gd" id="8_gc2cq"]
+[ext_resource type="Script" path="res://scenes/objects/boss/behavior/chase_player.gd" id="9_gy8io"]
+[ext_resource type="Script" path="res://scenes/objects/boss/behavior/idle.gd" id="10_2i0pu"]
+[ext_resource type="PackedScene" uid="uid://nvyqx0sfxs1y" path="res://scenes/objects/boss/behavior/seq_simple_shot.tscn" id="10_dps84"]
+[ext_resource type="Script" path="res://addons/DVs_behavior_tree/behavior_tree/composites/fallback_random.gd" id="10_j0agu"]
+[ext_resource type="PackedScene" uid="uid://bt1yw6ioibr33" path="res://scenes/objects/boss/behavior/seq_multi_shot.tscn" id="11_3jpih"]
+[ext_resource type="PackedScene" uid="uid://d0hm8gekw5s35" path="res://scenes/objects/boss/behavior/seq_crazy_shot.tscn" id="11_8w4v1"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_kg1a3"]
+radius = 60.0
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_stkro"]
+random_pitch = 1.8
+streams_count = 1
+stream_0/stream = ExtResource("3_dvr77")
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_ast43"]
+random_pitch = 1.8
+streams_count = 1
+stream_0/stream = ExtResource("3_0xk7r")
+
+[node name="Boss" type="CharacterBody2D"]
+motion_mode = 1
+script = ExtResource("1_eokto")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_xrxtq")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_kg1a3")
+
+[node name="Shot" type="AudioStreamPlayer" parent="."]
+stream = SubResource("AudioStreamRandomizer_stkro")
+
+[node name="Hurt" type="AudioStreamPlayer" parent="."]
+stream = SubResource("AudioStreamRandomizer_ast43")
+
+[node name="BTBehaviorTree" type="Node" parent="." node_paths=PackedStringArray("agent")]
+script = ExtResource("3_on36q")
+is_active = true
+agent = NodePath("..")
+frames_per_tick = 1
+
+[node name="BTFallback" type="Node" parent="BTBehaviorTree"]
+script = ExtResource("4_xboof")
+
+[node name="Dead" type="Node" parent="BTBehaviorTree/BTFallback"]
+script = ExtResource("5_yndej")
+conditional_abort = 1
+
+[node name="IsDead" type="Node" parent="BTBehaviorTree/BTFallback/Dead"]
+script = ExtResource("6_vldx5")
+key = "health"
+value_expression = "0"
+
+[node name="Dead" type="Node" parent="BTBehaviorTree/BTFallback/Dead"]
+script = ExtResource("7_8u207")
+
+[node name="Combat" type="Node" parent="BTBehaviorTree/BTFallback"]
+script = ExtResource("5_yndej")
+conditional_abort = 1
+
+[node name="IsFighting" type="Node" parent="BTBehaviorTree/BTFallback/Combat"]
+script = ExtResource("6_vldx5")
+key = "is_fighting"
+value_expression = "true"
+
+[node name="BTFallback" type="Node" parent="BTBehaviorTree/BTFallback/Combat"]
+script = ExtResource("4_xboof")
+
+[node name="ChasePlayer" type="Node" parent="BTBehaviorTree/BTFallback/Combat/BTFallback"]
+script = ExtResource("9_gy8io")
+
+[node name="HealthHigh" type="Node" parent="BTBehaviorTree/BTFallback/Combat/BTFallback"]
+script = ExtResource("5_yndej")
+
+[node name="IsHealthHigh" type="Node" parent="BTBehaviorTree/BTFallback/Combat/BTFallback/HealthHigh"]
+script = ExtResource("6_vldx5")
+key = "health"
+condition = 3
+value_expression = "75"
+
+[node name="BTFallbackRandom" type="Node" parent="BTBehaviorTree/BTFallback/Combat/BTFallback/HealthHigh"]
+script = ExtResource("10_j0agu")
+custom_weights = true
+Weights/SeqSimpleShot = 14.0
+Weights/SeqMultiShot = 1.0
+
+[node name="SeqSimpleShot" parent="BTBehaviorTree/BTFallback/Combat/BTFallback/HealthHigh/BTFallbackRandom" instance=ExtResource("10_dps84")]
+
+[node name="SeqMultiShot" parent="BTBehaviorTree/BTFallback/Combat/BTFallback/HealthHigh/BTFallbackRandom" instance=ExtResource("11_3jpih")]
+
+[node name="HealthLow" type="Node" parent="BTBehaviorTree/BTFallback/Combat/BTFallback"]
+script = ExtResource("5_yndej")
+
+[node name="IsHealthLow" type="Node" parent="BTBehaviorTree/BTFallback/Combat/BTFallback/HealthLow"]
+script = ExtResource("6_vldx5")
+key = "health"
+condition = 3
+value_expression = "40"
+
+[node name="BTFallbackRandom" type="Node" parent="BTBehaviorTree/BTFallback/Combat/BTFallback/HealthLow"]
+script = ExtResource("10_j0agu")
+custom_weights = true
+Weights/SeqSimpleShot = 12.0
+Weights/SeqMultiShot = 5.0
+Weights/SeqCrazyShot = 1.0
+
+[node name="SeqSimpleShot" parent="BTBehaviorTree/BTFallback/Combat/BTFallback/HealthLow/BTFallbackRandom" instance=ExtResource("10_dps84")]
+
+[node name="SeqMultiShot" parent="BTBehaviorTree/BTFallback/Combat/BTFallback/HealthLow/BTFallbackRandom" instance=ExtResource("11_3jpih")]
+
+[node name="SeqCrazyShot" parent="BTBehaviorTree/BTFallback/Combat/BTFallback/HealthLow/BTFallbackRandom" instance=ExtResource("11_8w4v1")]
+
+[node name="HealthVeryLow" type="Node" parent="BTBehaviorTree/BTFallback/Combat/BTFallback"]
+script = ExtResource("5_yndej")
+
+[node name="IsHealthVeryLow" type="Node" parent="BTBehaviorTree/BTFallback/Combat/BTFallback/HealthVeryLow"]
+script = ExtResource("6_vldx5")
+key = "health"
+condition = 3
+value_expression = "0"
+
+[node name="BTFallbackRandom" type="Node" parent="BTBehaviorTree/BTFallback/Combat/BTFallback/HealthVeryLow"]
+script = ExtResource("10_j0agu")
+custom_weights = true
+Weights/SeqSimpleShot = 7.0
+Weights/SeqMultiShot = 3.0
+Weights/SeqCrazyShot = 1.0
+
+[node name="SeqSimpleShot" parent="BTBehaviorTree/BTFallback/Combat/BTFallback/HealthVeryLow/BTFallbackRandom" instance=ExtResource("10_dps84")]
+
+[node name="SeqMultiShot" parent="BTBehaviorTree/BTFallback/Combat/BTFallback/HealthVeryLow/BTFallbackRandom" instance=ExtResource("11_3jpih")]
+
+[node name="SeqCrazyShot" parent="BTBehaviorTree/BTFallback/Combat/BTFallback/HealthVeryLow/BTFallbackRandom" instance=ExtResource("11_8w4v1")]
+
+[node name="Idle" type="Node" parent="BTBehaviorTree/BTFallback"]
+script = ExtResource("4_xboof")
+
+[node name="StartFighting" type="Node" parent="BTBehaviorTree/BTFallback/Idle"]
+script = ExtResource("5_yndej")
+conditional_abort = 1
+
+[node name="IsPlayerInRange" type="Node" parent="BTBehaviorTree/BTFallback/Idle/StartFighting"]
+script = ExtResource("8_gc2cq")
+
+[node name="SetFightingOn" type="Node" parent="BTBehaviorTree/BTFallback/Idle/StartFighting"]
+script = ExtResource("8_e3wu0")
+key = "is_fighting"
+value_expression = "true"
+
+[node name="Idle" type="Node" parent="BTBehaviorTree/BTFallback/Idle"]
+script = ExtResource("10_2i0pu")
