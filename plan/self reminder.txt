@@ -1,4 +1,0 @@
-Use 2 git branches, one for full game and one for template
-Include a copy of the addon in the full game branch
-Make releases out of template branch
-Each update, merge full game branch into template and remove the addon and boss AI files
