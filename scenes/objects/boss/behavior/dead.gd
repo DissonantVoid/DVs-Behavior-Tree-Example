@@ -3,7 +3,6 @@ extends BTAction
 func enter():
 	super()
 	
-	behavior_tree.agent.velocity = Vector2.ZERO
 	behavior_tree.agent.modulate = Color.BLACK
 
 func tick(delta : float):

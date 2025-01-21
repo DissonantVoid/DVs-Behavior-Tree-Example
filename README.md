@@ -9,3 +9,4 @@ This is mainly meant for me, the developer with a memory of a starfish and the u
 - Updates are made to the main branch, when we reach a new version everything from **main** is merged into **template** minus the boss behavior files and the addon.
 - The addon is included with **main** but not **template** to get users used to seting up the addon.
 - Releases are made out of the **template** branch.
+- Make sure that changes are reflected in the guide.

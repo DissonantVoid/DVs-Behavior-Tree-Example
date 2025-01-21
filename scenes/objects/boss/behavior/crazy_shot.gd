@@ -21,7 +21,7 @@ func exit(is_interrupted : bool):
 	
 	_time_between_shots.stop()
 
-func tick(delta ):
+func tick(delta : float):
 	super(delta)
 	
 	if _attack_timer.is_stopped():

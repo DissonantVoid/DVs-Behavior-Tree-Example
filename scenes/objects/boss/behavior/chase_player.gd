@@ -5,6 +5,11 @@ const _move_out_speed : float = 300.0
 const _min_distance : float = 180.0
 const _max_distance : float = 200.0
 
+func parent_exiting(is_interrupted : bool):
+	super(is_interrupted)
+	
+	behavior_tree.agent.velocity = Vector2.ZERO
+
 func tick(delta : float):
 	super(delta)
 	

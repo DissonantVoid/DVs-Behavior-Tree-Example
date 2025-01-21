@@ -2,7 +2,7 @@ extends BTCondition
 
 const _detect_distance : float = 250.0
 
-func tick(delta ):
+func tick(delta : float):
 	super(delta)
 	
 	var agent := behavior_tree.agent
